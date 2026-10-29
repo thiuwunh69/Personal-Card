@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tăng Quốc Thịnh · Digital Card</title>
+  <meta name="description" content="Digital Business Card của Tăng Quốc Thịnh - Software & Smart Home Enthusiast">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(22, 30, 46, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --accent-grad: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background orbs */
+    .orb-1, .orb-2 {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    .orb-1 {
+      width: 320px;
+      height: 320px;
+      background: #38bdf8;
+      top: -60px;
+      left: -60px;
+    }
+    .orb-2 {
+      width: 380px;
+      height: 380px;
+      background: #6366f1;
+      bottom: -80px;
+      right: -80px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Glass card utility */
+    .bento {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .bento:active {
+      transform: scale(0.99);
+    }
+
+    /* Header Profile */
+    .profile-card {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 28px 20px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--accent-grad);
+    }
+
+    .avatar-wrapper {
+      position: relative;
+    }
+    .avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 24px var(--accent-glow);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: -1px;
+    }
+    .status-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
+      background: #10b981;
+      border: 3px solid #0f172a;
+      border-radius: 50%;
+    }
+
+    .name-section h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .name-section p {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .badge-primary {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+    }
+
+    /* Save Contact Button */
+    .save-vcf-btn {
+      width: 100%;
+      background: var(--accent-grad);
+      color: #04101e;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.4);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .save-vcf-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 5px 15px -3px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Language Switcher */
+    .lang-switch {
+      display: flex;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid var(--card-border);
+      gap: 4px;
+    }
+    .lang-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* Bento Grid (Socials & Quick Links) */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .bento-item {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .bento-item:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .item-icon.linkedin { background: rgba(10, 102, 194, 0.2); color: #0a66c2; }
+    .item-icon.github { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .item-icon.mail { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .item-icon.chat { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+    .item-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .item-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* About Section */
+    .about-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+    .about-card p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    /* Tech Stack Tags */
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tech-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      color: #cbd5e1;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      padding: 10px 0 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+    .server-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0.3; transform: scale(0.9); }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb-1"></div>
+  <div class="orb-2"></div>
+
+  <div class="container">
+    <!-- Language Bar -->
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('vi')">🇻🇳 Tiếng Việt</button>
+      <button class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+      <button class="lang-btn" onclick="setLang('de')">🇩🇪 Deutsch</button>
+    </div>
+
+    <!-- Header / Bio -->
+    <div class="bento profile-card">
+      <div class="avatar-wrapper">
+        <div class="avatar">TQ</div>
+        <div class="status-badge" title="Online & Ready to Connect"></div>
+      </div>
+      <div class="name-section">
+        <h1>Tăng Quốc Thịnh</h1>
+        <p id="bio-title">Software & Smart Home Enthusiast</p>
+      </div>
+      <div class="badge-row">
+        <span class="badge badge-primary">🇩🇪 Germany</span>
+        <span class="badge">🏡 Self-Hosting</span>
+        <span class="badge">⚡ IoT & Automation</span>
+      </div>
+    </div>
+
+    <!-- 1-Tap Save Contact Button -->
+    <a href="/contact.vcf" download="Tang_Quoc_Thinh.vcf" class="save-vcf-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      <span id="btn-save-text">Lưu vào Danh Bạ (1 Chạm)</span>
+    </a>
+
+    <!-- Bento Links Grid -->
+    <div class="bento-grid">
+      <!-- LinkedIn -->
+      <a href="https://linkedin.com" target="_blank" rel="noopener" class="bento bento-item">
+        <div class="item-header">
+          <div class="item-icon linkedin">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.761-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+          </div>
+          <svg width="16" height="16" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </div>
+        <div>
+          <div class="item-label">LinkedIn</div>
+          <div class="item-sub">Kết nối chuyên môn</div>
+        </div>
+      </a>
+
+      <!-- GitHub -->
+      <a href="https://github.com" target="_blank" rel="noopener" class="bento bento-item">
+        <div class="item-header">
+          <div class="item-icon github">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+          </div>
+          <svg width="16" height="16" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </div>
+        <div>
+          <div class="item-label">GitHub</div>
+          <div class="item-sub">Dự án & Mã nguồn</div>
+        </div>
+      </a>
+
+      <!-- Direct Email -->
+      <a href="mailto:thinhnguyen6807@gmail.com" class="bento bento-item">
+        <div class="item-header">
+          <div class="item-icon mail">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <svg width="16" height="16" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </div>
+        <div>
+          <div class="item-label">Email Trực Tiếp</div>
+          <div class="item-sub">Gửi thư cho tôi</div>
+        </div>
+      </a>
+
+      <!-- Telegram / Chat -->
+      <a href="https://t.me" target="_blank" rel="noopener" class="bento bento-item">
+        <div class="item-header">
+          <div class="item-icon chat">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.61 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.87 7.97-3.43 3.79-1.58 4.58-1.85 5.1-1.86.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.16-.04.28z"/>
+            </svg>
+          </div>
+          <svg width="16" height="16" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </div>
+        <div>
+          <div class="item-label">Nhắn Tin</div>
+          <div class="item-sub">Trò chuyện nhanh</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- About Me Section -->
+    <div class="bento about-card">
+      <h3 id="about-heading">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        Đôi lời giới thiệu
+      </h3>
+      <p id="about-text">
+        Đam mê công nghệ, tự xây dựng hệ thống máy chủ cá nhân (Self-Hosting), nhà thông minh (Smart Home) và tự động hóa quy trình với AI. Luôn hào hứng kết nối và trao đổi về các dự án công nghệ sáng tạo!
+      </p>
+      <div class="tech-tags">
+        <span class="tech-tag">Linux / Debian</span>
+        <span class="tech-tag">Docker</span>
+        <span class="tech-tag">Home Assistant</span>
+        <span class="tech-tag">Python</span>
+        <span class="tech-tag">AI Workflows</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="server-pill">
+        <div class="pulse-dot"></div>
+        <span>Self-hosted on Dell Latitude E7440</span>
+      </div>
+      <span>Powered by Docker & Tailscale Funnel · 2026</span>
+    </footer>
+  </div>
+
+  <script>
+    const translations = {
+      vi: {
+        title: "Software & Smart Home Enthusiast",
+        btnSave: "Lưu vào Danh Bạ (1 Chạm)",
+        aboutHeading: "Đôi lời giới thiệu",
+        aboutText: "Đam mê công nghệ, tự xây dựng hệ thống máy chủ cá nhân (Self-Hosting), nhà thông minh (Smart Home) và tự động hóa quy trình với AI. Luôn hào hứng kết nối và trao đổi về các dự án công nghệ sáng tạo!",
+        subLinkedIn: "Kết nối chuyên môn",
+        subGitHub: "Dự án & Mã nguồn",
+        subMail: "Gửi thư cho tôi",
+        subChat: "Trò chuyện nhanh"
+      },
+      en: {
+        title: "Software & Smart Home Enthusiast",
+        btnSave: "Save to Contacts (1 Tap)",
+        aboutHeading: "About Me",
+        aboutText: "Passionate about software, self-hosting private cloud infrastructure, smart home automation, and AI workflows. Always open to collaborate and build cool things together!",
+        subLinkedIn: "Professional Network",
+        subGitHub: "Code & Projects",
+        subMail: "Drop me an email",
+        subChat: "Instant Chat"
+      },
+      de: {
+        title: "Software & Smart Home Enthusiast",
+        btnSave: "Kontakt speichern (1 Tipp)",
+        aboutHeading: "Über mich",
+        aboutText: "Begeistert von Softwareentwicklung, Self-Hosting von Cloud-Infrastruktur, Smart-Home-Automatisierung und KI. Immer offen für spannende Tech-Gespräche und Zusammenarbeit!",
+        subLinkedIn: "Berufliches Profil",
+        subGitHub: "Code & Projekte",
+        subMail: "E-Mail senden",
+        subChat: "Direkt chatten"
+      }
+    };
+
+    function setLang(lang) {
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const t = translations[lang];
+      document.getElementById('bio-title').textContent = t.title;
+      document.getElementById('btn-save-text').textContent = t.btnSave;
+      document.getElementById('about-heading').innerHTML = `
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        ${t.aboutHeading}
+      `;
+      document.getElementById('about-text').textContent = t.aboutText;
+    }
+
+    // Auto-detect browser language on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const userLang = navigator.language || navigator.userLanguage;
+      if (userLang.startsWith('de')) {
+        document.querySelectorAll('.lang-btn')[2].click();
+      } else if (!userLang.startsWith('vi')) {
+        document.querySelectorAll('.lang-btn')[1].click();
+      }
+    });
+  </script>
+</body>
+</html>
